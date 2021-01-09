@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+    <title>Hello, world!</title>
+    <style>
+    table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    td, th {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+    </style>
+  </head>
+  <body>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-database.js"></script>
+
+    <script>
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    var firebaseConfig = {
+    apiKey: "AIzaSyDj3vYaxIua6SEBCXU3EBkd0k8gVzsf248",
+    authDomain: "somesh-84c77.firebaseapp.com",
+    databaseURL: "https://somesh-84c77.firebaseio.com",
+    projectId: "somesh-84c77",
+    storageBucket: "somesh-84c77.appspot.com",
+    messagingSenderId: "783259032848",
+    appId: "1:783259032848:web:e5011328194314c7429995",
+    measurementId: "G-KT7XPS084Z"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+    var trname ;
+    var trstbid ;
+    var trbalance ;
+    var pay ;
+    var rmebalance ;
+    var idofdata ;
+    const database = firebase.database();
+    const ref = database.ref('customer');
+    const trref = database.ref('transaction');
+      ref.on("value", gotData, errData);
+      function gotData(data){
+        var s = data.val();
+        var keys = Object.keys(data.val());
+
+        for (var i = 0; i < keys.length; i++) {
+          var k = keys[i];
+          var name = s[k].name;
+          var stbid = s[k].stbid;
+          var mobileno= s[k].mobileno;
+          var address = s[k].address;
+          var status = s[k].status;
+          var balance = s[k].balance;
+
+          var rowname = i;
+          var node = document.createElement("tr");
+          node.id=rowname
+          document.getElementById("cilist1").appendChild(node);
+
+          var node = document.createElement("td");
+          var textnode = document.createTextNode(name);
+          node.appendChild(textnode);
+          document.getElementById(rowname).appendChild(node);
+          var node = document.createElement("td");
+          var textnode = document.createTextNode(stbid);
+          node.appendChild(textnode);
+          document.getElementById(rowname).appendChild(node);
+          var node = document.createElement("td");
+          var textnode = document.createTextNode(mobileno);
+          node.appendChild(textnode);
+          document.getElementById(rowname).appendChild(node);
+          var node = document.createElement("td");
+          var textnode = document.createTextNode(address);
+          node.appendChild(textnode);
+          document.getElementById(rowname).appendChild(node);
+          var node = document.createElement("td");
+          var textnode = document.createTextNode(status);
+          node.appendChild(textnode);
+          document.getElementById(rowname).appendChild(node);
+          var node = document.createElement("button");
+          var textnode = document.createTextNode(balance);
+          node.appendChild(textnode);
+          node.className = "btn btn-primary"
+          node.id = k;
+          node.onclick= function som(event) {
+            $('#exampleModalCenter').modal('show');
+            trbalance = event.target.innerText;
+            ref.on("value", gotData, errData);
+            function gotData(data){
+              var s = data.val();
+              var keys = Object.keys(data.val());
+              idofdata = event.target.id
+              for (var i = 0; i < keys.length; i++) {
+                var k = keys[i]
+                if(k == idofdata)
+                {
+                 trname = document.getElementById('modalname').innerHTML= s[k].name;
+                 trstbid = document.getElementById('modalstbid').innerHTML= s[k].stbid;
+                 document.getElementById('modalmobileno').innerHTML= s[k].mobileno;
+                 document.getElementById('modaladdress').innerHTML= s[k].address;
+                 document.getElementById('modelstatus').innerHTML= s[k].status;
+                 document.getElementById('modalbalance').innerHTML= s[k].balance;
+                }
+              }
+              document.getElementById("paybtn").addEventListener("click", function() {
+              pay = document.getElementById("pay").value;
+              console.log(pay);
+              rmebalance = event.target.innerText - pay ;
+              console.log(rmebalance);
+              document.getElementById('rmebalance').innerHTML = "BALANCE :" + rmebalance;
+                });
+            }
+              function errData(err){
+                console.log('Error!');
+                console.log(err);
+              }
+
+
+          }
+          document.getElementById(rowname).appendChild(node);
+        }
+
+      }
+      function errData(err){
+        console.log('Error!');
+        console.log(err);
+      }
+
+
+    function ADDcustomer() {
+    var data = {
+      balance: rmebalance
+
+    }
+    ref.child(idofdata).update(data);
+    var trdate = new Date();
+    trdate = trdate.getDate() + "-" + (trdate.getMonth()+1) + "-" + trdate.getFullYear() ;
+    console.log(trdate);
+    var trdata = {
+      name : trname,
+      stbid : trstbid,
+      date : trdate,
+      balance : trbalance,
+      pay : pay,
+      remain_balance : rmebalance
+    }
+
+    trref.push(trdata);
+
+    location.reload();
+
+    location.href="./payslip.html";
+  }
+
+  function myname() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInputname");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("cilist1");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+function mystbid() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInputstbid");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("cilist1");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+function mymobileno() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInputmobileno");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("cilist1");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[2];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+function myaddress() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInputaddress");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("cilist1");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[3];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+</script>
+    <a href="./home.html"><div class="p-3 mb-2 bg-info text-white"><h1 align="center">Joshi Cable Network</h1></div></a>
+    <center>
+    <a type="button" href="./Customer.html" class="btn btn-primary">Customer</a>
+    <a type="button" href="./transaction.html" class="btn btn-primary">Transaction</a>
+    <a type="button" href="./Plans.html" class="btn btn-primary" target="_blank">Plans</a>
+    </center>
+    <hr>
+    <!-- Button trigger modal -->
+    <center>
+      <input type="text" id="myInputname" onkeyup="myname()" placeholder="Search for Names.." >
+      <input type="text" id="myInputstbid" onkeyup="mystbid()" placeholder="Search for STB ID.." >
+      <input type="text" id="myInputmobileno" onkeyup="mymobileno()" placeholder="Search for Mobile NO.." >
+      <input type="text" id="myInputaddress" onkeyup="myaddress()" placeholder="Search for Address.." >
+    <hr>
+    <p>
+    <h2>Customer list</h2>
+      <table id="cilist1">
+        <tr>
+          <th>Name</th>
+          <th>STB ID</th>
+          <th>MOBILE NO</th>
+          <th>ADDRESS</th>
+          <th>Status</th>
+          <th>Balance</th>
+        </tr>
+        <tr id="cilist">
+
+        </tr>
+      </table>
+    </p>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class = "row" ><h3>Name:</h3><h3 id= "modalname"></h3></div><br>
+            <div class="row"><h3>STB ID:</h3><h3 id= "modalstbid"></h3></div><br>
+            <div class="row"><h3>Mobile No:</h3><h3 id= "modalmobileno"></h3></div><br>
+            <div class="row"><h3>Address:</h3><h3 id= "modaladdress"></h3></div><br>
+            <div class="row"><h3>Status:</h3><h3 id= "modelstatus"></h3></div><br>
+            <div class="row"><h3>Balance:<h3><h3 id= "modalbalance"></h3></div>
+            <hr>
+            <div class="form-row">
+                 <label>Pay:</label>
+                 <input type="number" class="form-control" placeholder="pay" id="pay">
+            </div>
+               <button aline="center" id="paybtn" class="btn btn-primary">Pay</button>
+          </div>
+           <h4 id="rmebalance"></h4>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="ADDcustomer()">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+
+    <!-- Option 2: jQuery, Popper.js, and Bootstrap JS-->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
+
+  </body>
+</html>

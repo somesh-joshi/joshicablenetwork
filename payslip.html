@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>A simple, clean, and responsive HTML invoice template</title>
+
+    <style>
+    .invoice-box {
+        max-width: 300px;
+        margin: auto;
+        padding: 30px;
+        border: 1px solid #eee;
+        box-shadow: 0 0 10px rgba(0, 0, 0, .15);
+        font-size: 16px;
+        line-height: 24px;
+        font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+        color: #555;
+    }
+
+    .invoice-box table {
+        width: 100%;
+        line-height: inherit;
+        text-align: left;
+    }
+
+    .invoice-box table td {
+        padding: 5px;
+        vertical-align: top;
+    }
+
+    .invoice-box table tr td:nth-child(2) {
+        text-align: right;
+    }
+
+    .invoice-box table tr.top table td {
+        padding-bottom: 20px;
+    }
+
+    .invoice-box table tr.top table td.title {
+        font-size: 45px;
+        line-height: 45px;
+        color: #333;
+    }
+
+    .invoice-box table tr.information table td {
+        padding-bottom: 40px;
+    }
+
+    .invoice-box table tr.heading td {
+        background: #eee;
+        border-bottom: 1px solid #ddd;
+        font-weight: bold;
+    }
+
+    .invoice-box table tr.details td {
+        padding-bottom: 20px;
+    }
+
+    .invoice-box table tr.item td{
+        border-bottom: 1px solid #eee;
+    }
+
+    .invoice-box table tr.item.last td {
+        border-bottom: none;
+    }
+
+    .invoice-box table tr.total td:nth-child(2) {
+        border-top: 2px solid #eee;
+        font-weight: bold;
+    }
+
+    @media only screen and (max-width: 600px) {
+        .invoice-box table tr.top table td {
+            width: 100%;
+            display: block;
+            text-align: center;
+        }
+
+        .invoice-box table tr.information table td {
+            width: 100%;
+            display: block;
+            text-align: center;
+        }
+    }
+
+    /** RTL **/
+    .rtl {
+        direction: rtl;
+        font-family: Tahoma, 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+    }
+
+    .rtl table {
+        text-align: right;
+    }
+
+    .rtl table tr td:nth-child(2) {
+        text-align: left;
+    }
+    </style>
+</head>
+
+<body>
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+   https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-database.js"></script>
+
+  <script>
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  var firebaseConfig = {
+  apiKey: "AIzaSyDj3vYaxIua6SEBCXU3EBkd0k8gVzsf248",
+  authDomain: "somesh-84c77.firebaseapp.com",
+  databaseURL: "https://somesh-84c77.firebaseio.com",
+  projectId: "somesh-84c77",
+  storageBucket: "somesh-84c77.appspot.com",
+  messagingSenderId: "783259032848",
+  appId: "1:783259032848:web:e5011328194314c7429995",
+  measurementId: "G-KT7XPS084Z"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+  var database = firebase.database();
+    var ref = database.ref('transaction');
+    ref.on("value", gotData);
+    function gotData(data){
+      var s = data.val();
+      var keys = Object.keys(data.val());
+
+      for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        var y = keys.length - 1 ;
+        if(i == y){
+        var name = s[k].name;
+        var stbid = s[k].stbid;
+        var date = s[k].date;
+        var balance= s[k].balance;
+        var pay = s[k].pay;
+        var remain_balance = s[k].remain_balance;
+
+        document.getElementById('name').innerHTML = "Name:" + name ;
+        document.getElementById('stbid').innerHTML = "STB ID:" + stbid ;
+        document.getElementById('Balance').innerHTML = "Balance: Rs " + balance ;
+        document.getElementById('pay').innerHTML = "Pay: Rs " + pay ;
+        document.getElementById('remain_balance').innerHTML = "remaing balance: Rs " + remain_balance ;
+
+        }
+      }
+    }
+    function printDiv(divName) {
+     var printContents = document.getElementById(divName).innerHTML;
+     var originalContents = document.body.innerHTML;
+
+     document.body.innerHTML = printContents;
+
+     window.print();
+
+     document.body.innerHTML = originalContents;
+}
+  </script>
+    <div class="invoice-box" id="printableArea">
+      <h2 style="text-align:center;">Joshi Cable Network</h2>
+        <p id="date" style="text-align:center;"></p>
+      <hr>
+      <h4 id="name"></h4>
+      <h4 id="stbid"></h4>
+      <h4 id="Balance"></h4>
+      <hr>
+      <h4 id="pay"></h4>
+      <h4 id="remain_balance"></h4>
+      <hr>
+    </div>
+    <input type="button" onclick="printDiv('printableArea')" value="print a div!" />
+</body>
+</html>
