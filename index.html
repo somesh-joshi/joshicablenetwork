@@ -18,6 +18,7 @@
   </head>
   <body onload="ath()">
     <script>
+     alart("pass is 1234");
     function ath() {
       $('#exampleModalCenter').modal('show');
     }
@@ -35,7 +36,7 @@
         var ref = database.ref('password');
           ref.on("value", gotData);
           function gotData(data){
-            alart("pass is 1234");
+   
             var s = "1234";
             if (pass == "1234"){
               location.href ="./home.html"
